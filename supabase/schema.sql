@@ -152,12 +152,10 @@ ALTER TABLE public.news_entries ENABLE ROW LEVEL SECURITY;
 
 -- 1. Users Policies (Prevent privilege escalation)
 DROP POLICY IF EXISTS "Admin can read all users" ON public.users;
-CREATE POLICY "Admin can read all users" ON public.users FOR SELECT TO authenticated
-USING ( public.is_admin() );
-
 DROP POLICY IF EXISTS "Users can read own row" ON public.users;
-CREATE POLICY "Users can read own row" ON public.users FOR SELECT TO authenticated
-USING ( (select auth.uid()) = id );
+DROP POLICY IF EXISTS "Users can read own row or admin can read all" ON public.users;
+CREATE POLICY "Users can read own row or admin can read all" ON public.users FOR SELECT TO authenticated
+USING ( (select auth.uid()) = id OR public.is_admin() );
 
 -- Only admins can modify users and roles (prevents users from promoting themselves)
 DROP POLICY IF EXISTS "Admin can update users" ON public.users;
