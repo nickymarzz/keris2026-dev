@@ -11,7 +11,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ------------------------------------------------------------------------------
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
-DROP FUNCTION IF EXISTS public.is_admin() CASCADE;
+DROP FUNCTION IF EXISTS private.is_admin() CASCADE;
 DROP FUNCTION IF EXISTS public.rls_auto_enable() CASCADE;
 
 DROP TABLE IF EXISTS public.scholars CASCADE;
@@ -34,6 +34,10 @@ CREATE TABLE IF NOT EXISTS public.users (
 -- ------------------------------------------------------------------------------
 -- Database Functions & Triggers
 -- ------------------------------------------------------------------------------
+
+-- Create a private schema for internal functions to hide them from the PostgREST API
+CREATE SCHEMA IF NOT EXISTS private;
+GRANT USAGE ON SCHEMA private TO authenticated, anon;
 
 -- Clean up any legacy or unwanted functions flagged by security linter
 DROP FUNCTION IF EXISTS public.rls_auto_enable();
@@ -67,7 +71,7 @@ REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM authenticated;
 
 -- 2. Helper function to check if the current authenticated user has admin role
 -- Security hardened with explicit search_path and SECURITY DEFINER
-CREATE OR REPLACE FUNCTION public.is_admin()
+CREATE OR REPLACE FUNCTION private.is_admin()
 RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -82,9 +86,9 @@ END;
 $$;
 
 -- Secure the function by revoking execute from PUBLIC and anon
-REVOKE EXECUTE ON FUNCTION public.is_admin() FROM PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon;
-GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated;
+REVOKE EXECUTE ON FUNCTION private.is_admin() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION private.is_admin() FROM anon;
+GRANT EXECUTE ON FUNCTION private.is_admin() TO authenticated;
 
 -- ------------------------------------------------------------------------------
 -- 2. Scholarships Table
@@ -186,18 +190,18 @@ DROP POLICY IF EXISTS "Admin can read all users" ON public.users;
 DROP POLICY IF EXISTS "Users can read own row" ON public.users;
 DROP POLICY IF EXISTS "Users can read own row or admin can read all" ON public.users;
 CREATE POLICY "Users can read own row or admin can read all" ON public.users FOR SELECT TO authenticated
-USING ( (select auth.uid()) = id OR public.is_admin() );
+USING ( (select auth.uid()) = id OR private.is_admin() );
 
 -- Only admins can modify users and roles (prevents users from promoting themselves)
 DROP POLICY IF EXISTS "Admin can update users" ON public.users;
 DROP POLICY IF EXISTS "Users can update own row" ON public.users;
 CREATE POLICY "Admin can update users" ON public.users FOR UPDATE TO authenticated
-USING ( public.is_admin() )
-WITH CHECK ( public.is_admin() );
+USING ( private.is_admin() )
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Admin can delete users" ON public.users;
 CREATE POLICY "Admin can delete users" ON public.users FOR DELETE TO authenticated
-USING ( public.is_admin() );
+USING ( private.is_admin() );
 
 -- 2. Scholarships Policies (Public read-only, admin mutate)
 DROP POLICY IF EXISTS "Anyone can read scholarships" ON public.scholarships;
@@ -208,18 +212,18 @@ USING ( true );
 DROP POLICY IF EXISTS "Anyone can insert scholarships" ON public.scholarships;
 DROP POLICY IF EXISTS "Admin can insert scholarships" ON public.scholarships;
 CREATE POLICY "Admin can insert scholarships" ON public.scholarships FOR INSERT TO authenticated
-WITH CHECK ( public.is_admin() );
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can update scholarships" ON public.scholarships;
 DROP POLICY IF EXISTS "Admin can update scholarships" ON public.scholarships;
 CREATE POLICY "Admin can update scholarships" ON public.scholarships FOR UPDATE TO authenticated
-USING ( public.is_admin() )
-WITH CHECK ( public.is_admin() );
+USING ( private.is_admin() )
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can delete scholarships" ON public.scholarships;
 DROP POLICY IF EXISTS "Admin can delete scholarships" ON public.scholarships;
 CREATE POLICY "Admin can delete scholarships" ON public.scholarships FOR DELETE TO authenticated
-USING ( public.is_admin() );
+USING ( private.is_admin() );
 
 -- 3. Scholars Policies (Public read-only, admin mutate)
 DROP POLICY IF EXISTS "Anyone can read scholars" ON public.scholars;
@@ -230,18 +234,18 @@ USING ( true );
 DROP POLICY IF EXISTS "Anyone can insert scholars" ON public.scholars;
 DROP POLICY IF EXISTS "Admin can insert scholars" ON public.scholars;
 CREATE POLICY "Admin can insert scholars" ON public.scholars FOR INSERT TO authenticated
-WITH CHECK ( public.is_admin() );
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can update scholars" ON public.scholars;
 DROP POLICY IF EXISTS "Admin can update scholars" ON public.scholars;
 CREATE POLICY "Admin can update scholars" ON public.scholars FOR UPDATE TO authenticated
-USING ( public.is_admin() )
-WITH CHECK ( public.is_admin() );
+USING ( private.is_admin() )
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can delete scholars" ON public.scholars;
 DROP POLICY IF EXISTS "Admin can delete scholars" ON public.scholars;
 CREATE POLICY "Admin can delete scholars" ON public.scholars FOR DELETE TO authenticated
-USING ( public.is_admin() );
+USING ( private.is_admin() );
 
 -- 4. Committee Policies (Public read-only, admin mutate)
 DROP POLICY IF EXISTS "Anyone can read committee" ON public.committee;
@@ -252,18 +256,18 @@ USING ( true );
 DROP POLICY IF EXISTS "Anyone can insert committee" ON public.committee;
 DROP POLICY IF EXISTS "Admin can insert committee" ON public.committee;
 CREATE POLICY "Admin can insert committee" ON public.committee FOR INSERT TO authenticated
-WITH CHECK ( public.is_admin() );
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can update committee" ON public.committee;
 DROP POLICY IF EXISTS "Admin can update committee" ON public.committee;
 CREATE POLICY "Admin can update committee" ON public.committee FOR UPDATE TO authenticated
-USING ( public.is_admin() )
-WITH CHECK ( public.is_admin() );
+USING ( private.is_admin() )
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can delete committee" ON public.committee;
 DROP POLICY IF EXISTS "Admin can delete committee" ON public.committee;
 CREATE POLICY "Admin can delete committee" ON public.committee FOR DELETE TO authenticated
-USING ( public.is_admin() );
+USING ( private.is_admin() );
 
 -- 5. History Entries Policies (Public read-only, admin mutate)
 DROP POLICY IF EXISTS "Anyone can read history" ON public.history_entries;
@@ -274,18 +278,18 @@ USING ( true );
 DROP POLICY IF EXISTS "Anyone can insert history" ON public.history_entries;
 DROP POLICY IF EXISTS "Admin can insert history" ON public.history_entries;
 CREATE POLICY "Admin can insert history" ON public.history_entries FOR INSERT TO authenticated
-WITH CHECK ( public.is_admin() );
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can update history" ON public.history_entries;
 DROP POLICY IF EXISTS "Admin can update history" ON public.history_entries;
 CREATE POLICY "Admin can update history" ON public.history_entries FOR UPDATE TO authenticated
-USING ( public.is_admin() )
-WITH CHECK ( public.is_admin() );
+USING ( private.is_admin() )
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Anyone can delete history" ON public.history_entries;
 DROP POLICY IF EXISTS "Admin can delete history" ON public.history_entries;
 CREATE POLICY "Admin can delete history" ON public.history_entries FOR DELETE TO authenticated
-USING ( public.is_admin() );
+USING ( private.is_admin() );
 
 -- 6. News Entries Policies (Public read-only, admin mutate, RLS strictly enabled)
 DROP POLICY IF EXISTS "Public read" ON public.news_entries;
@@ -296,18 +300,18 @@ USING ( true );
 DROP POLICY IF EXISTS "Auth insert" ON public.news_entries;
 DROP POLICY IF EXISTS "Admin can insert news" ON public.news_entries;
 CREATE POLICY "Admin can insert news" ON public.news_entries FOR INSERT TO authenticated
-WITH CHECK ( public.is_admin() );
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Auth update" ON public.news_entries;
 DROP POLICY IF EXISTS "Admin can update news" ON public.news_entries;
 CREATE POLICY "Admin can update news" ON public.news_entries FOR UPDATE TO authenticated
-USING ( public.is_admin() )
-WITH CHECK ( public.is_admin() );
+USING ( private.is_admin() )
+WITH CHECK ( private.is_admin() );
 
 DROP POLICY IF EXISTS "Auth delete" ON public.news_entries;
 DROP POLICY IF EXISTS "Admin can delete news" ON public.news_entries;
 CREATE POLICY "Admin can delete news" ON public.news_entries FOR DELETE TO authenticated
-USING ( public.is_admin() );
+USING ( private.is_admin() );
 
 -- ------------------------------------------------------------------------------
 -- 7. Storage Buckets
@@ -343,7 +347,7 @@ DROP POLICY IF EXISTS "Admin can upload scholarship logos" ON storage.objects;
 CREATE POLICY "Admin can upload media assets" ON storage.objects FOR INSERT TO authenticated
 WITH CHECK ( 
   bucket_id IN ('scholarship-logos', 'scholar-photos', 'committee-photos', 'news-images', 'history-images')
-  AND public.is_admin()
+  AND private.is_admin()
 );
 
 -- Public Buckets: Only authenticated admins can update/overwrite
@@ -351,11 +355,11 @@ DROP POLICY IF EXISTS "Admin can update media assets" ON storage.objects;
 CREATE POLICY "Admin can update media assets" ON storage.objects FOR UPDATE TO authenticated
 USING ( 
   bucket_id IN ('scholarship-logos', 'scholar-photos', 'committee-photos', 'news-images', 'history-images')
-  AND public.is_admin()
+  AND private.is_admin()
 )
 WITH CHECK ( 
   bucket_id IN ('scholarship-logos', 'scholar-photos', 'committee-photos', 'news-images', 'history-images')
-  AND public.is_admin()
+  AND private.is_admin()
 );
 
 -- Public Buckets: Only authenticated admins can delete
@@ -365,7 +369,7 @@ DROP POLICY IF EXISTS "Admin can delete scholarship logos" ON storage.objects;
 CREATE POLICY "Admin can delete media assets" ON storage.objects FOR DELETE TO authenticated
 USING ( 
   bucket_id IN ('scholarship-logos', 'scholar-photos', 'committee-photos', 'news-images', 'history-images')
-  AND public.is_admin()
+  AND private.is_admin()
 );
 
 -- Documents Bucket (Private): Scoped by user folder or admin override
@@ -373,19 +377,19 @@ DROP POLICY IF EXISTS "Users can read own documents" ON storage.objects;
 CREATE POLICY "Users can read own documents" ON storage.objects FOR SELECT TO authenticated
 USING ( 
   bucket_id = 'documents' 
-  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR public.is_admin() )
+  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR private.is_admin() )
 );
 
 DROP POLICY IF EXISTS "Users can upload own documents" ON storage.objects;
 CREATE POLICY "Users can upload own documents" ON storage.objects FOR INSERT TO authenticated
 WITH CHECK ( 
   bucket_id = 'documents' 
-  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR public.is_admin() )
+  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR private.is_admin() )
 );
 
 DROP POLICY IF EXISTS "Users can delete own documents" ON storage.objects;
 CREATE POLICY "Users can delete own documents" ON storage.objects FOR DELETE TO authenticated
 USING ( 
   bucket_id = 'documents' 
-  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR public.is_admin() )
+  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR private.is_admin() )
 );
