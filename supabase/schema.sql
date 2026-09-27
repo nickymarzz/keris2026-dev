@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS public.users (
 -- Database Functions & Triggers
 -- ------------------------------------------------------------------------------
 
+-- Clean up any legacy or unwanted functions flagged by security linter
+DROP FUNCTION IF EXISTS public.rls_auto_enable();
+
 -- 1. Automatically create a profile in public.users when a user signs up
 -- Security hardened with explicit search_path
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -42,6 +45,11 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+-- Secure the function by revoking execute from PUBLIC (prevents anon access)
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM authenticated;
+
 -- 2. Helper function to check if the current authenticated user has admin role
 -- Security hardened with explicit search_path and SECURITY DEFINER
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -57,6 +65,11 @@ BEGIN
   );
 END;
 $$;
+
+-- Secure the function by revoking execute from PUBLIC and anon
+REVOKE EXECUTE ON FUNCTION public.is_admin() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated;
 
 -- ------------------------------------------------------------------------------
 -- 2. Scholarships Table
