@@ -101,6 +101,9 @@ CREATE TABLE IF NOT EXISTS public.scholars (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+-- Create covering index for foreign key to improve query performance
+CREATE INDEX IF NOT EXISTS idx_scholars_scholarship_id ON public.scholars(scholarship_id);
+
 -- ------------------------------------------------------------------------------
 -- 4. Committee Members Table
 -- ------------------------------------------------------------------------------
