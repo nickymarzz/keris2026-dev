@@ -53,7 +53,7 @@ AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM public.users
-    WHERE id = auth.uid() AND role = 'admin'
+    WHERE id = (select auth.uid()) AND role = 'admin'
   );
 END;
 $$;
@@ -157,7 +157,7 @@ USING ( public.is_admin() );
 
 DROP POLICY IF EXISTS "Users can read own row" ON public.users;
 CREATE POLICY "Users can read own row" ON public.users FOR SELECT TO authenticated
-USING ( auth.uid() = id );
+USING ( (select auth.uid()) = id );
 
 -- Only admins can modify users and roles (prevents users from promoting themselves)
 DROP POLICY IF EXISTS "Admin can update users" ON public.users;
@@ -344,19 +344,19 @@ DROP POLICY IF EXISTS "Users can read own documents" ON storage.objects;
 CREATE POLICY "Users can read own documents" ON storage.objects FOR SELECT TO authenticated
 USING ( 
   bucket_id = 'documents' 
-  AND ( (storage.foldername(name))[1] = auth.uid()::text OR public.is_admin() )
+  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR public.is_admin() )
 );
 
 DROP POLICY IF EXISTS "Users can upload own documents" ON storage.objects;
 CREATE POLICY "Users can upload own documents" ON storage.objects FOR INSERT TO authenticated
 WITH CHECK ( 
   bucket_id = 'documents' 
-  AND ( (storage.foldername(name))[1] = auth.uid()::text OR public.is_admin() )
+  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR public.is_admin() )
 );
 
 DROP POLICY IF EXISTS "Users can delete own documents" ON storage.objects;
 CREATE POLICY "Users can delete own documents" ON storage.objects FOR DELETE TO authenticated
 USING ( 
   bucket_id = 'documents' 
-  AND ( (storage.foldername(name))[1] = auth.uid()::text OR public.is_admin() )
+  AND ( (storage.foldername(name))[1] = (select auth.uid())::text OR public.is_admin() )
 );
