@@ -19,10 +19,12 @@ export default function EditScholars() {
 
   const load = async () => {
     setLoading(true)
-    const [{ data: s }, { data: sh }] = await Promise.all([
-      supabase.from('scholars').select('*, scholarships(name)').order('batch', { ascending: false }),
+    const [{ data: s, error: errS }, { data: sh, error: errSh }] = await Promise.all([
+      supabase.from('scholars').select('*, scholarships(name)').order('spm_batch', { ascending: false }),
       supabase.from('scholarships').select('id, name').order('name'),
     ])
+    if (errS) console.error('Error loading scholars:', errS)
+    if (errSh) console.error('Error loading scholarships:', errSh)
     setScholars(s || [])
     setScholarships(sh || [])
     setLoading(false)

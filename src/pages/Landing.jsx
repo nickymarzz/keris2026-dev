@@ -428,33 +428,50 @@ return (
             (() => {
               const managing = directors.find(d => d.role?.toLowerCase().includes('managing'))
               const coDirectors = directors.filter(d => !d.role?.toLowerCase().includes('managing'))
-              const DirCard = ({ member, size = 'sm' }) => (
-                <div className={`text-center ${size === 'lg' ? 'w-52' : 'w-44'}`}>
-                  <div className={`relative mx-auto mb-3 overflow-hidden ${size === 'lg' ? 'w-52 h-52' : 'w-44 h-44'}`}>
+              const DirCard = ({ member, size = 'sm', isManaging = false }) => (
+                <div className={`group text-center cursor-pointer select-none ${size === 'lg' ? 'w-56' : 'w-48'}`}>
+                  <div className={`relative mx-auto mb-3 overflow-visible ${size === 'lg' ? 'w-56 h-56' : 'w-48 h-48'}`}>
                     {member.photo_url ? (
-                      <img src={member.photo_url} alt={member.name} className="w-full h-full object-contain" />
+                      <img
+                        src={member.photo_url}
+                        alt={member.name}
+                        className={`w-full h-full object-contain ${
+                          isManaging ? 'managing-director-cutout-glow' : 'director-cutout-glow'
+                        }`}
+                      />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-gold/50 text-2xl" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>{member.name?.charAt(0)}</span>
+                      <div className={`w-full h-full flex items-center justify-center ${
+                        isManaging ? 'managing-director-cutout-glow' : 'director-cutout-glow'
+                      }`}>
+                        <span className="text-gold/50 text-3xl" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>
+                          {member.name?.charAt(0)}
+                        </span>
                       </div>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-maroon to-transparent pointer-events-none" />
                   </div>
-                  <h4 className="text-sm font-700 text-cream leading-tight" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700 }}>{member.name}</h4>
-                  <p className="text-gold/70 text-xs font-times mt-1">{member.role}</p>
+                  <h4
+                    className="text-base font-700 text-cream leading-tight group-hover:text-gold transition-colors duration-200"
+                    style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700 }}
+                  >
+                    {member.name}
+                  </h4>
+                  <p className="text-gold/80 text-xs font-times mt-1 group-hover:text-gold transition-colors duration-200">
+                    {member.role}
+                  </p>
                 </div>
               )
               return (
-                <div>
+                <div className="flex flex-col items-center">
                   {managing && (
-                    <div className="flex justify-center mb-2">
+                    <div className="flex justify-center mb-4">
                       <div className="-translate-y-4">
-                        <DirCard member={managing} size="lg" />
+                        <DirCard member={managing} size="lg" isManaging={true} />
                       </div>
                     </div>
                   )}
-                  <div className="flex justify-center gap-8">
-                    {coDirectors.map(d => <DirCard key={d.id} member={d} size="sm" />)}
+                  <div className="flex justify-center items-end gap-8 md:gap-12 flex-wrap">
+                    {coDirectors.map(d => <DirCard key={d.id} member={d} size="sm" isManaging={false} />)}
                   </div>
                 </div>
               )
@@ -474,9 +491,9 @@ return (
               <button
                 key={d}
                 onClick={() => setActiveDept(d)}
-                className={`px-4 py-2 text-xs font-700 uppercase tracking-wider transition-colors border ${
+                className={`px-4 py-2 text-xs font-700 uppercase tracking-wider transition-all duration-200 border ${
                   activeDept === d
-                    ? 'bg-gold text-maroon border-gold'
+                    ? 'bg-gold text-maroon border-gold shadow-[0_0_15px_rgba(230,161,34,0.3)]'
                     : 'bg-transparent text-cream/50 border-gold/20 hover:border-gold/40 hover:text-cream/80'
                 }`}
                 style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700, borderRadius: 0 }}
@@ -490,38 +507,58 @@ return (
           {activeDeptMembers.length === 0 ? (
             <p className="text-center text-cream/30 font-times text-sm">No members added yet.</p>
           ) : (() => {
-            const head    = activeDeptMembers.find(m => m.is_head)
-            const members = activeDeptMembers.filter(m => !m.is_head)
+            const head = activeDeptMembers.find(m => m.is_head) ||
+                         activeDeptMembers.find(m => {
+                           const r = (m.role || '').toLowerCase()
+                           return r.includes('head') || r.includes('lead') || r.includes('director') || r.includes('chief')
+                         })
+            const members = activeDeptMembers.filter(m => m.id !== head?.id)
+
             const MemberCard = ({ member, size = 'sm' }) => (
-              <div className={`text-center ${size === 'lg' ? 'w-52' : 'w-44'}`}>
-                <div className={`relative mx-auto mb-3 overflow-hidden ${size === 'lg' ? 'w-52 h-52' : 'w-44 h-44'}`}>
+              <div className={`group text-center cursor-pointer select-none ${size === 'lg' ? 'w-52' : 'w-44'}`}>
+                <div className={`relative mx-auto mb-3 overflow-visible ${size === 'lg' ? 'w-52 h-52' : 'w-44 h-44'}`}>
                   {member.photo_url ? (
-                    <img src={member.photo_url} alt={member.name} className="w-full h-full object-contain" />
+                    <img
+                      src={member.photo_url}
+                      alt={member.name}
+                      className="w-full h-full object-contain member-cutout-glow"
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-gold/50 text-2xl" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>{member.name?.charAt(0)}</span>
+                    <div className="w-full h-full flex items-center justify-center member-cutout-glow">
+                      <span className="text-gold/50 text-2xl" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>
+                        {member.name?.charAt(0)}
+                      </span>
                     </div>
                   )}
                   <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-maroon to-transparent pointer-events-none" />
                 </div>
-                <h4 className="text-sm font-700 text-cream leading-tight" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700 }}>{member.name}</h4>
-                <p className="text-gold/70 text-xs font-times mt-1">{member.role}</p>
+                <h4
+                  className="text-sm font-700 text-cream leading-tight group-hover:text-gold transition-colors duration-200"
+                  style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700 }}
+                >
+                  {member.name}
+                </h4>
+                <p className="text-gold/70 text-xs font-times mt-1 group-hover:text-gold transition-colors duration-200">
+                  {member.role}
+                </p>
               </div>
             )
             return (
-              <div>
-                {/* Head — centered, elevated */}
+              <div className="flex flex-col items-center">
+                {/* Head — centered, elevated tier */}
                 {head && (
-                  <div className="flex justify-center mb-2">
+                  <div className="flex justify-center mb-3">
                     <div className="-translate-y-4">
                       <MemberCard member={head} size="lg" />
                     </div>
                   </div>
                 )}
-                {/* Three members below */}
-                <div className="flex justify-center items-end gap-8 flex-wrap">
-                  {members.map(m => <MemberCard key={m.id} member={m} size="sm" />)}
-                </div>
+                {/* Committee members tier below */}
+                {members.length > 0 && (
+                  <div className="flex justify-center items-end gap-8 md:gap-10 flex-wrap max-w-5xl">
+                    {members.map(m => <MemberCard key={m.id} member={m} size="sm" />)}
+                  </div>
+                )}
               </div>
             )
           })()}

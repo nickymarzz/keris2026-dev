@@ -4,6 +4,13 @@ import { supabase } from '../lib/supabase'
 
 const STATUS_CLASSES = { open: 'badge-open', closed: 'badge-closed', soon: 'badge-soon' }
 
+function getStatusInfo(status) {
+  const s = (status || '').toLowerCase().trim()
+  if (s === 'open') return { label: 'Open', className: 'badge-open' }
+  if (s === 'soon' || s === 'upcoming' || s === 'opening soon') return { label: 'Opening Soon', className: 'badge-soon' }
+  return { label: 'Closed', className: 'badge-closed' }
+}
+
 export default function ScholarshipDetail() {
   const { id } = useParams()
   const [scholarship, setScholarship] = useState(null)
@@ -36,7 +43,7 @@ export default function ScholarshipDetail() {
     </div>
   )
 
-  const statusClass = STATUS_CLASSES[scholarship.status] || 'badge-closed'
+  const { label: statusLabel, className: statusClass } = getStatusInfo(scholarship.status)
 
   return (
     <div className="page-enter min-h-screen pb-20 bg-gradient-to-b from-wine/30 via-wine/20 to-wine/30">
@@ -70,7 +77,7 @@ export default function ScholarshipDetail() {
         <div className="relative z-10 px-6 md:px-10 pb-8 w-full">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-3 mb-2 flex-wrap">
-              <span className={`status-badge ${statusClass}`}>{scholarship.status}</span>
+              <span className={`status-badge ${statusClass}`}>{statusLabel}</span>
             </div>
             <h1
               className="text-3xl md:text-5xl font-900 text-cream leading-tight"

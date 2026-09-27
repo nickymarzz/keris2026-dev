@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear()
+
   return (
     <footer className="bg-maroon border-t border-gold/15 mt-auto">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -15,7 +17,7 @@ export default function Footer() {
               KERIS
             </h3>
             <p className="text-cream/50 text-sm leading-relaxed font-times max-w-xs">
-              Kelantan Education Resource Initiative for Students
+              Kelantan Education Resource Initiative for Students.
               Empowering the next generation of leaders.
             </p>
             <div className="flex gap-4 mt-5">
@@ -43,9 +45,9 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 { to: '/', label: 'Home' },
-                { to: '/history', label: 'History' },
-                { to: '/scholars', label: 'Scholars' },
-                { to: '/scholarships', label: 'Scholarships' },
+                { to: '/news', label: 'News & Announcements' },
+                { to: '/scholars', label: 'Scholars Directory' },
+                { to: '/scholarships', label: 'Scholarships Hub' },
               ].map(({ to, label }) => (
                 <li key={to}>
                   <Link to={to} className="text-cream/45 hover:text-gold text-sm transition-colors font-times">
@@ -56,17 +58,22 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Tools */}
+          {/* Tools & Admin */}
           <div>
             <h4
               className="text-gold text-xs font-700 tracking-widest uppercase mb-4"
               style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700 }}
             >
-              Tools
+              Resources & Admin
             </h4>
             <ul className="space-y-2">
-              <li><Link to="/resume" className="text-cream/45 hover:text-gold text-sm transition-colors font-times">Resume</Link></li>
-              <li><Link to="/essay"  className="text-cream/45 hover:text-gold text-sm transition-colors font-times">Essay</Link></li>
+              <li><Link to="/resume" className="text-cream/45 hover:text-gold text-sm transition-colors font-times">Resume Template</Link></li>
+              <li><Link to="/essay"  className="text-cream/45 hover:text-gold text-sm transition-colors font-times">Essay Repository</Link></li>
+              <li className="pt-2">
+                <Link to="/admin" className="text-gold/70 hover:text-gold text-xs font-spartan uppercase tracking-wider transition-colors inline-flex items-center gap-1.5">
+                  <span>⚙</span> Admin Portal →
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -74,7 +81,7 @@ export default function Footer() {
         <div className="keris-divider mt-10" />
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-cream/25 text-xs font-times">
-          <p>© 2023 KERIS. All rights reserved.</p>
+          <p>© {currentYear} KERIS. All rights reserved.</p>
           <p>For scholars, By scholars</p>
         </div>
       </div>

@@ -13,6 +13,14 @@ const CREAM   = '#FDF6E3'
 
 const CHART_COLORS = [GOLD, CRIMSON, WINE, '#c8891c', '#a01528', '#3d1012']
 
+function normalizeStatus(val) {
+  if (!val) return ''
+  const s = val.toLowerCase().trim()
+  if (s === 'open') return 'open'
+  if (s === 'soon' || s === 'upcoming' || s === 'opening soon') return 'soon'
+  if (s === 'closed') return 'closed'
+  return s
+}
 
 export default function Scholarships() {
   const [scholarships, setScholarships] = useState([])
@@ -37,17 +45,41 @@ export default function Scholarships() {
   const allCourses = useMemo(() => {
     const courses = new Set()
     scholarships.forEach(s => {
-      if (Array.isArray(s.courses_offered)) s.courses_offered.forEach(c => courses.add(c))
+      if (Array.isArray(s.courses_offered)) {
+        s.courses_offered.forEach(c => {
+          if (c && typeof c === 'string') courses.add(c.trim())
+        })
+      }
     })
     return [...courses].sort()
   }, [scholarships])
 
   const filtered = useMemo(() => {
     return scholarships.filter(s => {
-      if (search && !s.name?.toLowerCase().includes(search.toLowerCase()) &&
-          !s.about?.toLowerCase().includes(search.toLowerCase())) return false
-      if (status !== 'all' && s.status !== status) return false
-      if (course !== 'all' && !(Array.isArray(s.courses_offered) && s.courses_offered.includes(course))) return false
+      // 1. Search term match (name, about, country, courses)
+      if (search.trim()) {
+        const q = search.toLowerCase().trim()
+        const matchName = s.name?.toLowerCase().includes(q)
+        const matchAbout = s.about?.toLowerCase().includes(q)
+        const matchCountry = s.country?.toLowerCase().includes(q)
+        const matchCourses = Array.isArray(s.courses_offered) && s.courses_offered.some(c => c?.toLowerCase().includes(q))
+        if (!matchName && !matchAbout && !matchCountry && !matchCourses) return false
+      }
+
+      // 2. Status match (robust normalization)
+      if (status !== 'all') {
+        const normS = normalizeStatus(s.status)
+        const normFilter = normalizeStatus(status)
+        if (normS !== normFilter) return false
+      }
+
+      // 3. Course match
+      if (course !== 'all') {
+        if (!Array.isArray(s.courses_offered)) return false
+        const hasCourse = s.courses_offered.some(c => c?.trim().toLowerCase() === course.trim().toLowerCase())
+        if (!hasCourse) return false
+      }
+
       return true
     })
   }, [scholarships, search, status, course])
@@ -55,7 +87,9 @@ export default function Scholarships() {
   /* Chart data */
   const statusData = useMemo(() => {
     const counts = scholarships.reduce((acc, s) => {
-      acc[s.status] = (acc[s.status] || 0) + 1
+      const norm = normalizeStatus(s.status)
+      const label = norm === 'open' ? 'Open' : norm === 'soon' ? 'Opening Soon' : 'Closed'
+      acc[label] = (acc[label] || 0) + 1
       return acc
     }, {})
     return Object.entries(counts).map(([name, value]) => ({ name, value }))

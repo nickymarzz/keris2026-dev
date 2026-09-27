@@ -6,6 +6,17 @@ const STATUS_CLASSES = {
   soon:   'badge-soon',
 }
 
+function getStatusInfo(status) {
+  const s = (status || '').toLowerCase().trim()
+  if (s === 'open') {
+    return { label: 'Open', className: 'badge-open' }
+  }
+  if (s === 'soon' || s === 'upcoming' || s === 'opening soon') {
+    return { label: 'Opening Soon', className: 'badge-soon' }
+  }
+  return { label: 'Closed', className: 'badge-closed' }
+}
+
 function getLocationLabel(country) {
   if (!country) return null
   const countries = country.split(', ').map(c => c.trim())
@@ -17,7 +28,7 @@ function getLocationLabel(country) {
 }
 
 export default function ScholarshipCard({ scholarship }) {
-  const statusClass = STATUS_CLASSES[scholarship.status] || 'badge-closed'
+  const { label: statusLabel, className: statusClass } = getStatusInfo(scholarship.status)
   const locationLabel = getLocationLabel(scholarship.country)
 
   return (
@@ -46,7 +57,7 @@ export default function ScholarshipCard({ scholarship }) {
             {scholarship.name}
           </h3>
           <span className={`status-badge ${statusClass} shrink-0`}>
-            {scholarship.status}
+            {statusLabel}
           </span>
         </div>
 
