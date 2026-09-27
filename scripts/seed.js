@@ -42,7 +42,7 @@ async function seed() {
   const scholarshipsData = [
     {
       name: 'Yayasan Khazanah Global Scholarship',
-      status: 'Open',
+      status: 'open',
       about: 'A prestigious flagship sponsorship supporting outstanding Malaysian students to pursue undergraduate studies at premier universities worldwide, fostering leadership potential.',
       courses_offered: ['Computer Science', 'Data Science', 'Economics', 'Finance', 'Civil Engineering', 'Mechanical Engineering'],
       study_duration: '4 - 5 Years (Including Foundation/A-Levels)',
@@ -52,10 +52,12 @@ async function seed() {
       income_group: 'Open to all (Merit-based)',
       min_result: 'Minimum 8A+ in SPM',
       logo_url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop&q=80',
+      is_bumiputera: false,
+      is_anak_negeri: false,
     },
     {
       name: 'Petronas Education Sponsorship Programme (PESP)',
-      status: 'Open',
+      status: 'open',
       about: 'Petronas offers scholarships to talented young Malaysians with exceptional academic results and leadership abilities to pursue tertiary studies locally and abroad.',
       courses_offered: ['Chemical Engineering', 'Petroleum Engineering', 'Mechanical Engineering', 'Computer Science', 'Geology', 'Accounting'],
       study_duration: '4 Years',
@@ -65,10 +67,12 @@ async function seed() {
       income_group: 'Open to all',
       min_result: 'Minimum 8A (A/A+) in SPM',
       logo_url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&auto=format&fit=crop&q=80',
+      is_bumiputera: false,
+      is_anak_negeri: false,
     },
     {
       name: 'JPA Program Khas Jepun, Korea, Perancis, Jerman (JKPJ)',
-      status: 'Upcoming',
+      status: 'soon',
       about: 'Government sponsorship under Jabatan Perkhidmatan Awam (JPA) for top SPM achievers to pursue preparatory and engineering/technical degrees in leading industrial nations.',
       courses_offered: ['Mechanical Engineering', 'Electrical Engineering', 'Aerospace Engineering', 'Robotics', 'Biotechnology'],
       study_duration: '5 - 6 Years (Including 2 Years Language Preparatory)',
@@ -78,10 +82,12 @@ async function seed() {
       income_group: 'Open to all (Priority to B40/M40)',
       min_result: 'Straight As in SPM',
       logo_url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&auto=format&fit=crop&q=80',
+      is_bumiputera: true,
+      is_anak_negeri: false,
     },
     {
       name: 'Bank Negara Malaysia Kijang Scholarship',
-      status: 'Closed',
+      status: 'closed',
       about: 'Awarded to the nation\'s top SPM performers who aspire to pursue university degrees in Economics, Accounting, Finance, Actuarial Science, and Law.',
       courses_offered: ['Economics', 'Finance', 'Actuarial Science', 'Accounting', 'Law', 'Computer Science'],
       study_duration: '4 Years',
@@ -91,10 +97,12 @@ async function seed() {
       income_group: 'Merit-based',
       min_result: 'Minimum 8A+ in SPM',
       logo_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&auto=format&fit=crop&q=80',
+      is_bumiputera: false,
+      is_anak_negeri: false,
     },
     {
       name: 'Yayasan Sime Darby Undergraduate Scholarship',
-      status: 'Upcoming',
+      status: 'soon',
       about: 'Supporting bright and deserving individuals with high academic standing and strong extracurricular records to pursue undergraduate degrees locally and internationally.',
       courses_offered: ['Agriculture', 'Civil Engineering', 'Human Resource Management', 'Marketing', 'Data Science'],
       study_duration: '3 - 4 Years',
@@ -104,10 +112,12 @@ async function seed() {
       income_group: 'Priority to households with combined monthly income < RM11,000',
       min_result: 'Minimum 7As in SPM',
       logo_url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&auto=format&fit=crop&q=80',
+      is_bumiputera: false,
+      is_anak_negeri: false,
     },
     {
       name: 'MARA Young Talent Programme (YTP)',
-      status: 'Open',
+      status: 'open',
       about: 'Flagship convertible loan scheme for high-achieving Bumiputera SPM students to pursue preparatory studies leading to bachelor degrees in world-class institutions.',
       courses_offered: ['Medicine', 'Dentistry', 'Pharmacy', 'Architecture', 'Computer Science', 'Aviation'],
       study_duration: '4 - 5 Years',
@@ -117,6 +127,23 @@ async function seed() {
       income_group: 'Bumiputera students (B40/M40 priority)',
       min_result: 'Minimum 7A- and above in SPM',
       logo_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&auto=format&fit=crop&q=80',
+      is_bumiputera: true,
+      is_anak_negeri: false,
+    },
+    {
+      name: 'Biasiswa Yayasan Kelantan Darulnaim (YAKIN)',
+      status: 'open',
+      about: 'Special state sponsorship awarded to anak jati Kelantan pursuing higher education across public and recognized private universities.',
+      courses_offered: ['Medicine', 'Islamic Finance', 'Civil Engineering', 'Information Technology', 'Syariah & Law'],
+      study_duration: '3 - 5 Years',
+      country: 'Malaysia',
+      application_url: 'https://yakin.kelantan.gov.my',
+      extra_details: 'Specifically designated for students born in Kelantan or having at least one parent born in Kelantan.',
+      income_group: 'B40 and M40',
+      min_result: 'Minimum 6As in SPM',
+      logo_url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&auto=format&fit=crop&q=80',
+      is_bumiputera: true,
+      is_anak_negeri: true,
     },
   ]
 
@@ -141,72 +168,84 @@ async function seed() {
   const scholarsData = [
     {
       name: 'Ahmad Faris bin Zulkifli',
+      batch: 2022,
       spm_batch: 2022,
       scholarship_id: sMap['Yayasan Khazanah Global Scholarship'],
       past_school: 'Maktab Rendah Sains MARA Pengkalan Chepa',
       current_university: 'Imperial College London',
       course: 'MEng Electrical and Electronic Engineering',
       photo_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&auto=format&fit=crop&q=80',
+      vlog_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       instagram: 'fariszul_my',
       contact_email: 'faris.zul@imperial.ac.uk',
       about: 'Hailing from Pasir Mas, Faris was active in robotic competitions throughout secondary school. Passionate about semiconductor tech and sustainable energy transition.',
     },
     {
       name: 'Nur Aisyah binti Mohd Radzi',
+      batch: 2023,
       spm_batch: 2023,
       scholarship_id: sMap['Petronas Education Sponsorship Programme (PESP)'],
       past_school: 'SMK Maktab Sultan Ismail (SIC), Kota Bharu',
       current_university: 'Universiti Teknologi PETRONAS (UTP)',
       course: 'BSc Computer Science (Data Science)',
       photo_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+      vlog_url: null,
       instagram: 'aisyah_radzi',
       contact_email: 'aisyah.radzi@utp.edu.my',
       about: 'SPM 2023 straight-A+ scorer from Kota Bharu. Enthusiastic about artificial intelligence applications in natural disaster forecasting for East Coast communities.',
     },
     {
       name: 'Nik Muhammad Danish bin Nik Ariffin',
+      batch: 2021,
       spm_batch: 2021,
       scholarship_id: sMap['JPA Program Khas Jepun, Korea, Perancis, Jerman (JKPJ)'],
       past_school: 'SM Sains Tengku Muhammad Faris Petra',
       current_university: 'Kyoto University, Japan',
       course: 'BSc Mechanical Engineering',
       photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+      vlog_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       instagram: 'nikdanish.jp',
       contact_email: 'danish.ariffin@kyoto-u.ac.jp',
       about: 'Studied Japanese intensive preparatory at Ambang Asuhan Jepun (UM) before moving to Kansai. Actively mentors Kelantanese juniors aspiring to study in East Asia.',
     },
     {
       name: 'Siti Sarah binti Khairul Anuar',
+      batch: 2022,
       spm_batch: 2022,
       scholarship_id: sMap['Bank Negara Malaysia Kijang Scholarship'],
       past_school: 'SMK Zainab (1), Kota Bharu',
       current_university: 'London School of Economics (LSE)',
       course: 'BSc Economics',
       photo_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80',
+      vlog_url: null,
       instagram: 'sarah.khairul',
       contact_email: 's.k.anuar@lse.ac.uk',
       about: 'Passionate about macroeconomic policy and financial inclusion for small rural entrepreneurs in Kelantan. Completed Cambridge A-Levels at Kolej Tuanku Ja\'afar.',
     },
     {
       name: 'Muhammad Amirul Hakim bin Roslan',
+      batch: 2023,
       spm_batch: 2023,
       scholarship_id: sMap['MARA Young Talent Programme (YTP)'],
       past_school: 'MRSM Tumpat',
       current_university: 'Universiti Malaya (UM)',
       course: 'Bachelor of Medicine and Bachelor of Surgery (MBBS)',
       photo_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+      vlog_url: null,
       instagram: 'amirul_hakim99',
       contact_email: 'amirul.roslan@um.edu.my',
       about: 'Aspiring pediatric specialist from Tumpat. Strong advocate for peer-tutoring initiatives and volunteer medical relief in flood-affected regions.',
     },
     {
       name: 'Wan Dania Batrisyia binti Wan Azman',
+      batch: 2021,
       spm_batch: 2021,
       scholarship_id: sMap['Yayasan Sime Darby Undergraduate Scholarship'],
       past_school: 'SMK Kubang Kerian 1',
       current_university: 'University of Bristol, UK',
       course: 'MEng Civil Engineering',
       photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=80',
+      vlog_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       instagram: 'dania.azman',
       contact_email: 'dania.azman@bristol.ac.uk',
       about: 'Focusing on flood mitigation infrastructure and smart urban water systems. President of the Bristol Malaysian Cultural Society 2024/2025.',
@@ -225,11 +264,11 @@ async function seed() {
   // -------------------------------------------------------------
   console.log('⏳ Seeding Committee Members...')
   const committeeData = [
-    // 3 Directors (with Managing Director in middle for perfect landing page hero display)
     {
       name: 'Syed Alif Imran',
       role: 'Director of Strategic Initiatives',
       department: 'Directors',
+      batch_year: 2026,
       is_head: false,
       photo_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80',
     },
@@ -237,6 +276,7 @@ async function seed() {
       name: 'Nik Adam Harris',
       role: 'Managing Director',
       department: 'Directors',
+      batch_year: 2026,
       is_head: true,
       photo_url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&auto=format&fit=crop&q=80',
     },
@@ -244,88 +284,49 @@ async function seed() {
       name: 'Wan Nurul Izzah',
       role: 'Director of Operations & Partnerships',
       department: 'Directors',
+      batch_year: 2026,
       is_head: false,
       photo_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80',
     },
-
-    // Secretarial & Finance
     {
       name: 'Muhammad Haziq Imran',
       role: 'Head of Secretarial & Finance',
       department: 'Secretarial & Finance',
+      batch_year: 2026,
       is_head: true,
       photo_url: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&auto=format&fit=crop&q=80',
     },
     {
-      name: 'Fatin Nabilah binti Che Rani',
-      role: 'Finance Associate',
-      department: 'Secretarial & Finance',
-      is_head: false,
-      photo_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80',
-    },
-
-    // Programmes & PR
-    {
       name: 'Mohd Danial Haikal',
       role: 'Head of Programmes & PR',
       department: 'Programmes & PR',
+      batch_year: 2026,
       is_head: true,
       photo_url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&auto=format&fit=crop&q=80',
     },
     {
-      name: 'Nur Aina Safiya',
-      role: 'PR & Outreach Officer',
-      department: 'Programmes & PR',
-      is_head: false,
-      photo_url: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=600&auto=format&fit=crop&q=80',
-    },
-
-    // Content & Resources
-    {
       name: 'Siti Maisarah binti Zahari',
       role: 'Head of Content & Resources',
       department: 'Content & Resources',
+      batch_year: 2026,
       is_head: true,
       photo_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=80',
     },
     {
-      name: 'Luqman Hakim bin Azhar',
-      role: 'Editorial Lead',
-      department: 'Content & Resources',
-      is_head: false,
-      photo_url: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=600&auto=format&fit=crop&q=80',
-    },
-
-    // Publicity & Design
-    {
       name: 'Irfan Syazwan',
       role: 'Head of Publicity & Design',
       department: 'Publicity & Design',
+      batch_year: 2026,
       is_head: true,
       photo_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
     },
     {
-      name: 'Anis Nadirah',
-      role: 'Creative Designer',
-      department: 'Publicity & Design',
-      is_head: false,
-      photo_url: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=80',
-    },
-
-    // Technical
-    {
       name: 'Amiruddin Asyraf',
       role: 'Head of Technical & Web Dev',
       department: 'Technical',
+      batch_year: 2026,
       is_head: true,
       photo_url: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&auto=format&fit=crop&q=80',
-    },
-    {
-      name: 'Farhan Naufal',
-      role: 'Systems & Cloud Engineer',
-      department: 'Technical',
-      is_head: false,
-      photo_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80',
     },
   ]
 
@@ -337,7 +338,45 @@ async function seed() {
   }
 
   // -------------------------------------------------------------
-  // 4. SEED NEWS & ANNOUNCEMENTS
+  // 4. SEED HISTORY / MILESTONES
+  // -------------------------------------------------------------
+  console.log('⏳ Seeding History & Milestones...')
+  const historyData = [
+    {
+      year: 2023,
+      title: 'KERIS Founded',
+      body: 'Initiated by a cohort of passionate Kelantanese scholars abroad with a unified vision to democratize scholarship mentorship for post-SPM students in rural Kelantan.',
+      image_url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      year: 2024,
+      title: 'Inaugural SPM Outreach Roadshow',
+      body: 'Conducted physical scholarship clinics across 6 secondary schools in Kota Bharu, Machang, and Pasir Mas, impacting over 800 high-achieving candidates.',
+      image_url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      year: 2025,
+      title: 'Flagship Mentorship Programme Launch',
+      body: 'Officially launched 1-on-1 virtual mentoring matching over 150 SPM scholars with alumni across Ivy League, Oxbridge, Kyoto, and Malaysian research universities.',
+      image_url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      year: 2026,
+      title: 'KERIS Digital Ecosystem & Global Scholar Network',
+      body: 'Transitioned into a full-scale digital hub offering interactive scholarship directories, essay vetting repositories, and nationwide alumni networking.',
+      image_url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&auto=format&fit=crop&q=80',
+    },
+  ]
+
+  const { error: errHistory } = await supabase.from('history_entries').insert(historyData)
+  if (errHistory) {
+    console.error('❌ Error inserting history entries:', errHistory.message)
+  } else {
+    console.log(`✅ Inserted ${historyData.length} history milestones.`)
+  }
+
+  // -------------------------------------------------------------
+  // 5. SEED NEWS & ANNOUNCEMENTS
   // -------------------------------------------------------------
   console.log('⏳ Seeding News & Events...')
   const newsData = [
@@ -355,7 +394,7 @@ async function seed() {
       title: 'Masterclass: Cracking JPA & Khazanah Assessment Centers',
       body: 'Join our exclusive webinar with alumni currently studying at Oxford, Cambridge, Imperial, and Kyoto. Gain direct insights into group discussions, behavioral interviews, and personal statements.',
       date: '2026-02-28',
-      category: 'Workshop',
+      category: 'Event',
       image_urls: [
         'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
       ],
@@ -373,7 +412,7 @@ async function seed() {
       title: 'Community Impact Report 2025: Over 85 Scholars Placed Worldwide',
       body: 'Reflecting on our milestones: KERIS assisted over 3,000 Kelantanese students in 2025 through roadshows, digital webinars, and personal statement clinics, securing over RM 18M in total scholarships.',
       date: '2026-01-20',
-      category: 'Event',
+      category: 'Update',
       image_urls: [
         'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&auto=format&fit=crop&q=80',
       ],

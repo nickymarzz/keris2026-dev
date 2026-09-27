@@ -17,6 +17,7 @@ import EditScholars from './pages/admin/EditScholars'
 import EditScholarships from './pages/admin/EditScholarships'
 import EditCommittee from './pages/admin/EditCommittee'
 import EditNews from './pages/admin/EditNews'
+import EditHistory from './pages/admin/EditHistory'
 import ScholarshipDetail from './pages/ScholarshipDetail'
 import ScholarDetail from './pages/ScholarDetail'
 import NotFound from './pages/NotFound'
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/admin/scholarships"  element={<AdminGate><EditScholarships /></AdminGate>} />
             <Route path="/admin/committee"     element={<AdminGate><EditCommittee /></AdminGate>} />
             <Route path="/admin/news"          element={<AdminGate><EditNews /></AdminGate>} />
+            <Route path="/admin/history"       element={<AdminGate><EditHistory /></AdminGate>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

@@ -30,6 +30,7 @@ export default function Scholarships() {
   const [search,  setSearch]  = useState('')
   const [status,  setStatus]  = useState('all')
   const [course,  setCourse]  = useState('all')
+  const [quota,   setQuota]   = useState('all')
 
   useEffect(() => {
     supabase
@@ -80,9 +81,13 @@ export default function Scholarships() {
         if (!hasCourse) return false
       }
 
+      // 4. Quota / Eligibility match
+      if (quota === 'bumiputera' && !s.is_bumiputera) return false
+      if (quota === 'anak_negeri' && !s.is_anak_negeri) return false
+
       return true
     })
-  }, [scholarships, search, status, course])
+  }, [scholarships, search, status, course, quota])
 
   /* Chart data */
   const statusData = useMemo(() => {
@@ -159,14 +164,20 @@ export default function Scholarships() {
               />
             </div>
             {/* Status */}
-            <select value={status} onChange={e => setStatus(e.target.value)} className="keris-input md:w-40">
+            <select value={status} onChange={e => setStatus(e.target.value)} className="keris-input md:w-36">
               <option value="all">All Status</option>
               <option value="open">Open</option>
               <option value="soon">Opening Soon</option>
               <option value="closed">Closed</option>
             </select>
+            {/* Eligibility / Quota */}
+            <select value={quota} onChange={e => setQuota(e.target.value)} className="keris-input md:w-44">
+              <option value="all">All Eligibility</option>
+              <option value="bumiputera">Bumiputera Only</option>
+              <option value="anak_negeri">Anak Negeri Kelantan</option>
+            </select>
             {/* Course */}
-            <select value={course} onChange={e => setCourse(e.target.value)} className="keris-input md:w-52">
+            <select value={course} onChange={e => setCourse(e.target.value)} className="keris-input md:w-48">
               <option value="all">All Courses</option>
               {allCourses.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -187,6 +198,7 @@ export default function Scholarships() {
         <p className="text-cream/25 text-xs font-times mt-2">
           {filtered.length} of {scholarships.length} scholarships
           {status !== 'all' && ` · ${status}`}
+          {quota !== 'all' && ` · ${quota === 'bumiputera' ? 'Bumiputera' : 'Anak Negeri'}`}
           {course !== 'all' && ` · ${course}`}
         </p>
       </div>
@@ -257,7 +269,7 @@ export default function Scholarships() {
           <div className="text-center py-20">
             <p className="text-cream/30 font-times text-lg mb-4">No scholarships match your filters.</p>
             <button
-              onClick={() => { setSearch(''); setStatus('all'); setCourse('all') }}
+              onClick={() => { setSearch(''); setStatus('all'); setCourse('all'); setQuota('all') }}
               className="text-gold/60 hover:text-gold text-sm font-spartan uppercase tracking-wide transition-colors"
               style={{ fontFamily: "'League Spartan', sans-serif" }}
             >

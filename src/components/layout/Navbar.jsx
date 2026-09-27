@@ -14,10 +14,10 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const { user, isPasscodeAuthed, signOut } = useAuthStore()
+  const { user, isPasscodeAuthed, signOut, isAdmin } = useAuthStore()
   const navigate = useNavigate()
 
-  const isAuthed = Boolean(user || isPasscodeAuthed)
+  const isAuthed = isAdmin()
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20)

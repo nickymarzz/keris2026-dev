@@ -85,6 +85,7 @@ const EMPTY = {
   study_duration: '', countries: [], application_url: '',
   extra_details: '', income_group: '',
   min_result: '', logo_url: '',
+  is_bumiputera: false, is_anak_negeri: false,
 }
 
 const STATUS_OPTIONS = ['open', 'soon', 'closed']
@@ -113,6 +114,8 @@ export default function EditScholarships() {
       ...EMPTY, ...s,
       courses_offered: Array.isArray(s.courses_offered) ? s.courses_offered : [],
       countries: s.country ? s.country.split(', ').filter(Boolean) : [],
+      is_bumiputera: Boolean(s.is_bumiputera),
+      is_anak_negeri: Boolean(s.is_anak_negeri),
     })
     setEditing(s.id)
     setError('')
@@ -160,6 +163,8 @@ export default function EditScholarships() {
       income_group:    form.income_group    || null,
       min_result:      form.min_result      || null,
       logo_url:        form.logo_url        || null,
+      is_bumiputera:   Boolean(form.is_bumiputera),
+      is_anak_negeri:  Boolean(form.is_anak_negeri),
     }
     if (editing === 'new') {
       const { error: e } = await supabase.from('scholarships').insert(payload)
@@ -261,9 +266,36 @@ export default function EditScholarships() {
                   value={form.extra_details}
                   onChange={e => set('extra_details', e.target.value)}
                   rows={2}
-                  placeholder="e.g. Bumiputera only, Anak Negeri, open to all races…"
+                  placeholder="e.g. Merit-based, priority to low-income households, etc…"
                   className="keris-input resize-none"
                 />
+              </div>
+
+              {/* Special Quota & Eligibility */}
+              <div className="md:col-span-2 flex flex-wrap gap-6 p-4 bg-maroon/30 border border-gold/15">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(form.is_bumiputera)}
+                    onChange={e => set('is_bumiputera', e.target.checked)}
+                    className="accent-gold w-4 h-4 cursor-pointer"
+                  />
+                  <span className="text-xs text-cream/80 font-spartan uppercase tracking-wider" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                    Bumiputera Only
+                  </span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(form.is_anak_negeri)}
+                    onChange={e => set('is_anak_negeri', e.target.checked)}
+                    className="accent-gold w-4 h-4 cursor-pointer"
+                  />
+                  <span className="text-xs text-cream/80 font-spartan uppercase tracking-wider" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                    Anak Negeri Kelantan
+                  </span>
+                </label>
               </div>
 
               {/* Courses Offered */}
@@ -322,7 +354,23 @@ export default function EditScholarships() {
                   </tr>
                 ) : filtered.map(s => (
                   <tr key={s.id}>
-                    <td className="font-times text-cream/80">{s.name}</td>
+                    <td className="font-times text-cream/80">
+                      <div>{s.name}</div>
+                      {(s.is_bumiputera || s.is_anak_negeri) && (
+                        <div className="flex gap-1.5 mt-1">
+                          {s.is_bumiputera && (
+                            <span className="text-[10px] bg-gold/15 text-gold px-1.5 py-0.5 border border-gold/30 font-spartan uppercase">
+                              Bumiputera
+                            </span>
+                          )}
+                          {s.is_anak_negeri && (
+                            <span className="text-[10px] bg-crimson/20 text-cream/90 px-1.5 py-0.5 border border-crimson/40 font-spartan uppercase">
+                              Anak Negeri
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </td>
                     <td>
                       <div className="relative group">
                         <span className={`status-badge ${STATUS_CLASSES[s.status] || 'badge-closed'} cursor-pointer`}>

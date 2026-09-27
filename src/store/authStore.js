@@ -4,29 +4,70 @@ import { supabase } from '../lib/supabase'
 const SESSION_KEY = 'keris_admin_auth'
 const DEFAULT_PASS = 'keris2026'
 
+async function fetchUserProfile(userId) {
+  if (!userId) return null
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle()
+
+    if (error) {
+      console.warn('Notice querying public.users:', error.message)
+      return null
+    }
+    return data
+  } catch (err) {
+    console.warn('Unexpected error querying public.users:', err)
+    return null
+  }
+}
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   profile: null,
+  loading: true,
   isPasscodeAuthed: typeof window !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === '1',
 
   init: async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      set({ user: session?.user ?? null, profile: session?.user ?? null })
+      const user = session?.user ?? null
+      let profile = null
 
-      supabase.auth.onAuthStateChange((_event, session) => {
-        set({ user: session?.user ?? null, profile: session?.user ?? null })
+      if (user) {
+        profile = await fetchUserProfile(user.id)
+      }
+
+      set({ user, profile, loading: false })
+
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        const u = session?.user ?? null
+        let p = null
+        if (u) {
+          p = await fetchUserProfile(u.id)
+        }
+        set({ user: u, profile: p, loading: false })
       })
     } catch (e) {
       console.warn('Supabase auth init notice:', e?.message)
+      set({ loading: false })
     }
   },
 
   signInWithPassword: async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
-    set({ user: data.user, profile: data.user })
-    return data
+
+    const profile = await fetchUserProfile(data.user.id)
+    set({ user: data.user, profile })
+
+    if (!profile || profile.role !== 'admin') {
+      throw new Error('Access denied: This account is authenticated but does not have admin permissions in public.users.')
+    }
+
+    return { user: data.user, profile }
   },
 
   signInWithPasscode: (code) => {
@@ -51,6 +92,7 @@ export const useAuthStore = create((set, get) => ({
 
   isAdmin: () => {
     const state = get()
-    return Boolean(state.user || state.isPasscodeAuthed)
+    if (state.isPasscodeAuthed) return true
+    return state.profile?.role === 'admin'
   },
 }))

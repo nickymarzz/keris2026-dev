@@ -129,9 +129,37 @@ export default function ScholarDetail() {
           {scholar.scholarship_name && scholar.scholarship_name !== '—' && (
             <Fact label="Scholarship" value={scholar.scholarship_name} />
           )}
+          {scholar.batch && <Fact label="KERIS Batch" value={`Batch ${scholar.batch}`} />}
           {scholar.spm_batch && <Fact label="SPM Batch" value={String(scholar.spm_batch)} />}
           {scholar.past_school && <Fact label="Past School" value={scholar.past_school} />}
         </div>
+
+        {/* Scholar Vlog / Journey Video */}
+        {scholar.vlog_url && (
+          <div className="p-6 bg-gradient-to-r from-maroon/60 via-wine/50 to-maroon/60 border border-gold/30">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-xs text-gold font-spartan uppercase tracking-widest mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  Scholar Journey & Vlog
+                </p>
+                <h3 className="text-xl font-800 text-cream" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>
+                  Watch {scholar.name?.split(' ')[0]}'s Experience
+                </h3>
+                <p className="text-cream/50 font-times text-sm mt-0.5">
+                  Discover firsthand tips, university preparation, and campus life.
+                </p>
+              </div>
+              <a
+                href={scholar.vlog_url.startsWith('http') ? scholar.vlog_url : `https://${scholar.vlog_url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary inline-flex items-center gap-2 shrink-0 self-start sm:self-center"
+              >
+                <span>▶</span> Watch Vlog
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* About / Bio */}
         {scholar.about && (

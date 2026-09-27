@@ -2,7 +2,16 @@ import { useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 
 export default function AdminGate({ children }) {
-  const { user, isPasscodeAuthed, signInWithPasscode, signInWithPassword } = useAuthStore()
+  const {
+    user,
+    profile,
+    loading: authLoading,
+    signInWithPasscode,
+    signInWithPassword,
+    signOut,
+    isAdmin,
+  } = useAuthStore()
+
   const [tab, setTab] = useState('passcode') // 'passcode' | 'email'
   
   // Passcode state
@@ -15,8 +24,42 @@ export default function AdminGate({ children }) {
   const [loading, setLoading] = useState(false)
   const [emailError, setEmailError] = useState('')
 
-  const isAuthed = Boolean(user || isPasscodeAuthed)
-  if (isAuthed) return children
+  // If initial auth check is in flight
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // Verified admin
+  if (isAdmin()) return children
+
+  // Logged-in user who is NOT an admin
+  if (user && !isAdmin()) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6 py-20">
+        <div className="glass-card p-8 md:p-10 w-full max-w-md text-center" style={{ borderRadius: 0, borderTop: '3px solid #840E20' }}>
+          <div className="text-3xl mb-3">🔒</div>
+          <h1
+            className="text-2xl font-900 text-cream mb-2"
+            style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 900 }}
+          >
+            Access Denied
+          </h1>
+          <p className="text-cream/70 font-times text-sm mb-6 leading-relaxed">
+            Signed in as <strong className="text-gold">{user.email}</strong>, but your account does not have administrator privileges in <code className="text-cream/90 bg-maroon/60 px-1.5 py-0.5 border border-gold/20">public.users</code> (role: <span className="text-gold">{profile?.role || 'user'}</span>).
+          </p>
+          <div className="flex flex-col gap-3">
+            <button onClick={signOut} className="btn-primary justify-center">
+              Sign Out / Switch Account
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const handlePasscodeSubmit = (e) => {
     e.preventDefault()
@@ -56,7 +99,7 @@ export default function AdminGate({ children }) {
           </span>
         </div>
         <p className="text-cream/50 font-times text-sm mb-6">
-          Access restricted to KERIS administrators and organizers.
+          Access restricted to KERIS administrators verified in public.users.
         </p>
 
         {/* Tab switchers */}
@@ -147,10 +190,10 @@ export default function AdminGate({ children }) {
               disabled={loading}
               className="btn-primary justify-center mt-2 disabled:opacity-50"
             >
-              {loading ? 'Signing in…' : 'Sign In with Supabase'}
+              {loading ? 'Verifying role…' : 'Sign In with Supabase'}
             </button>
             <p className="text-cream/30 text-xs font-times text-center mt-2">
-              Manage accounts in Supabase Dashboard → Authentication → Users
+              Verifies <code className="text-gold/70">role = 'admin'</code> from the <code className="text-gold/70">public.users</code> table.
             </p>
           </form>
         )}

@@ -3,8 +3,8 @@ import { supabase } from '../../lib/supabase'
 import ImageUpload from '../../components/ui/ImageUpload'
 
 const EMPTY = {
-  name: '', spm_batch: '', scholarship_id: '', past_school: '',
-  current_university: '', course: '', photo_url: '', instagram: '', contact_email: '', about: '',
+  name: '', batch: '', spm_batch: '', scholarship_id: '', past_school: '',
+  current_university: '', course: '', photo_url: '', vlog_url: '', instagram: '', contact_email: '', about: '',
 }
 
 export default function EditScholars() {
@@ -44,12 +44,14 @@ export default function EditScholars() {
     setError('')
     const payload = {
       name: form.name,
+      batch: form.batch ? parseInt(form.batch) : null,
       spm_batch: form.spm_batch ? parseInt(form.spm_batch) : null,
       scholarship_id: form.scholarship_id || null,
       past_school: form.past_school || null,
       current_university: form.current_university || null,
       course: form.course || null,
       photo_url: form.photo_url || null,
+      vlog_url: form.vlog_url || null,
       instagram: form.instagram ? form.instagram.replace(/^@/, '') : null,
       contact_email: form.contact_email || null,
       about: form.about || null,
@@ -102,13 +104,19 @@ export default function EditScholars() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <AdminField label="Full Name *"       value={form.name}          onChange={v => set('name', v)}          placeholder="Ahmad Zulkifli" />
-              <AdminField label="SPM Batch (Year)" value={form.spm_batch}     onChange={v => set('spm_batch', v)}     placeholder="2023" type="number" />
+              <div className="grid grid-cols-2 gap-2">
+                <AdminField label="KERIS Batch"     value={form.batch}         onChange={v => set('batch', v)}         placeholder="2024" type="number" />
+                <AdminField label="SPM Batch (Year)" value={form.spm_batch}    onChange={v => set('spm_batch', v)}     placeholder="2023" type="number" />
+              </div>
               <AdminField label="Past School"         value={form.past_school}        onChange={v => set('past_school', v)}        placeholder="SMK Likas" />
               <AdminField label="Current University" value={form.current_university} onChange={v => set('current_university', v)} placeholder="Universiti Malaya" />
               <AdminField label="Course"             value={form.course}             onChange={v => set('course', v)}             placeholder="Computer Science" />
               <AdminField label="Contact Email"     value={form.contact_email} onChange={v => set('contact_email', v)} placeholder="ahmad@email.com" />
               <ImageUpload label="Photo" value={form.photo_url} onChange={v => set('photo_url', v)} bucket="scholar-photos" aspect="portrait" />
               <AdminField label="Instagram Username" value={form.instagram}   onChange={v => set('instagram', v)}     placeholder="@ahmadzulkifli" />
+              <div className="md:col-span-2">
+                <AdminField label="Vlog / Video Journey URL" value={form.vlog_url} onChange={v => set('vlog_url', v)} placeholder="https://youtube.com/watch?v=... or TikTok" />
+              </div>
 
               {/* Scholarship select */}
               <div className="md:col-span-2">
@@ -172,10 +180,10 @@ export default function EditScholars() {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>SPM Batch</th>
+                  <th>Batch / SPM</th>
                   <th>Scholarship</th>
                   <th>University</th>
-                  <th>Instagram</th>
+                  <th>Media</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -200,10 +208,28 @@ export default function EditScholars() {
                         <span className="font-times text-cream/80">{scholar.name}</span>
                       </div>
                     </td>
-                    <td className="text-cream/50 font-times">{scholar.spm_batch ?? '—'}</td>
+                    <td className="text-cream/50 font-times text-xs">
+                      {scholar.batch && <span className="text-gold/80 block">Batch {scholar.batch}</span>}
+                      <span>SPM {scholar.spm_batch ?? '—'}</span>
+                    </td>
                     <td className="text-cream/50 font-times">{scholar.scholarships?.name || '—'}</td>
                     <td className="text-cream/50 font-times">{scholar.current_university || '—'}</td>
-                    <td className="text-cream/50 font-times text-xs">{scholar.instagram ? `@${scholar.instagram}` : '—'}</td>
+                    <td className="text-cream/50 font-times text-xs">
+                      <div className="flex flex-col gap-1">
+                        {scholar.instagram && <span>@{scholar.instagram}</span>}
+                        {scholar.vlog_url && (
+                          <a
+                            href={scholar.vlog_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gold hover:underline flex items-center gap-1"
+                          >
+                            🎥 Vlog
+                          </a>
+                        )}
+                        {!scholar.instagram && !scholar.vlog_url && '—'}
+                      </div>
+                    </td>
                     <td>
                       <div className="flex gap-2">
                         <button

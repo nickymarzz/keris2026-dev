@@ -40,8 +40,10 @@ export default function Scholars() {
         !search ||
         s.name?.toLowerCase().includes(search.toLowerCase()) ||
         s.scholarship_name?.toLowerCase().includes(search.toLowerCase()) ||
-        s.past_school?.toLowerCase().includes(search.toLowerCase())
-      const matchBatch = selectedBatch === 'all' || String(s.spm_batch) === selectedBatch
+        s.past_school?.toLowerCase().includes(search.toLowerCase()) ||
+        s.current_university?.toLowerCase().includes(search.toLowerCase()) ||
+        s.course?.toLowerCase().includes(search.toLowerCase())
+      const matchBatch = selectedBatch === 'all' || String(s.spm_batch) === selectedBatch || String(s.batch) === selectedBatch
       const matchScholarship = selectedScholarship === 'all' || s.scholarship_name === selectedScholarship
       return matchSearch && matchBatch && matchScholarship
     })

@@ -90,12 +90,21 @@ function PieLabel({ cx, cy, midAngle, outerRadius, name, value }) {
 
 export default function Landing() {
   const [committee, setCommittee] = useState([])
+  const [history, setHistory]     = useState([])
   const [activeDept, setActiveDept] = useState(DEPARTMENTS[0])
 
   useEffect(() => {
     supabase.from('committee').select('*').order('created_at', { ascending: true })
       .then(({ data }) => data && setCommittee(data))
+
+    supabase.from('history_entries').select('*').order('year', { ascending: true })
+      .then(({ data }) => data && setHistory(data))
   }, [])
+
+  const committeeYear = useMemo(() => {
+    const years = committee.map(m => m.batch_year).filter(Boolean)
+    return years.length ? Math.max(...years) : null
+  }, [committee])
 
 const directors = useMemo(() => {
     const dirs = committee.filter(m => m.department === 'Directors')
@@ -405,6 +414,56 @@ return (
         </div>
       </section>
 
+      {/* ─── MILESTONES & HISTORY ─── */}
+      {history.length > 0 && (
+        <section className="py-24 border-t border-gold/10">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="keris-divider mb-12">
+              <span className="text-gold text-xs font-700 tracking-[0.3em] uppercase" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700 }}>
+                Our Journey
+              </span>
+            </div>
+            <h2 className="text-4xl font-800 text-cream text-center mb-14" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>
+              KERIS <span className="text-gold">Milestones</span>
+            </h2>
+
+            <div className="relative border-l border-gold/30 ml-4 md:ml-32 pl-6 md:pl-10 space-y-12">
+              {history.map((item, idx) => (
+                <div key={item.id || idx} className="relative group">
+                  {/* Glowing dot */}
+                  <div className="absolute -left-[31px] md:-left-[47px] top-1 w-4 h-4 rounded-full bg-gold border-4 border-maroon shadow-md transition-transform group-hover:scale-125" />
+
+                  {/* Year badge */}
+                  <span className="inline-block text-xs font-700 font-spartan bg-gold/15 text-gold border border-gold/30 px-2.5 py-0.5 uppercase tracking-widest mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                    {item.year}
+                  </span>
+
+                  <div className="glass-card p-6 border-gold/20 flex flex-col md:flex-row gap-6 items-start" style={{ borderRadius: 0 }}>
+                    {item.image_url && (
+                      <div className="w-full md:w-44 h-32 shrink-0 overflow-hidden bg-wine/30 border border-gold/20">
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-800 text-cream mb-2" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>
+                        {item.title}
+                      </h3>
+                      <p className="text-cream/70 font-times text-sm leading-relaxed">
+                        {item.body}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── COMMITTEE ─── */}
       <section className="py-24">
         <div className="max-w-6xl mx-auto px-6">
@@ -414,7 +473,7 @@ return (
           </span>
         </div>
         <h2 className="text-4xl font-800 text-cream text-center mb-14" style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 800 }}>
-          Meet the <span className="text-gold">Team</span>
+          Meet the {committeeYear ? `${committeeYear} ` : ''}<span className="text-gold">Committee</span>
         </h2>
 
         {/* Directors */}

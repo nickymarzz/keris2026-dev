@@ -38,13 +38,20 @@ export default function ScholarCard({ scholar }) {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-maroon/90 via-transparent to-transparent" />
 
+        {/* Vlog indicator */}
+        {scholar.vlog_url && (
+          <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm border border-gold/40 text-gold text-[10px] font-spartan px-2 py-0.5 tracking-wider uppercase flex items-center gap-1">
+            <span>🎥</span> Vlog
+          </div>
+        )}
+
         {/* Batch badge */}
-        {scholar.spm_batch && (
+        {(scholar.spm_batch || scholar.batch) && (
           <div
             className="absolute top-3 right-3 bg-gold text-maroon text-xs font-700 px-2 py-1"
             style={{ fontFamily: "'League Spartan', sans-serif", fontWeight: 700 }}
           >
-            SPM {scholar.spm_batch}
+            {scholar.spm_batch ? `SPM ${scholar.spm_batch}` : `Batch ${scholar.batch}`}
           </div>
         )}
       </div>

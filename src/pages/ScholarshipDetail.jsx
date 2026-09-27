@@ -78,6 +78,16 @@ export default function ScholarshipDetail() {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-3 mb-2 flex-wrap">
               <span className={`status-badge ${statusClass}`}>{statusLabel}</span>
+              {scholarship.is_bumiputera && (
+                <span className="status-badge bg-gold/15 text-gold border border-gold/30">
+                  Bumiputera
+                </span>
+              )}
+              {scholarship.is_anak_negeri && (
+                <span className="status-badge bg-crimson/25 text-cream border border-crimson/40">
+                  Anak Negeri Kelantan
+                </span>
+              )}
             </div>
             <h1
               className="text-3xl md:text-5xl font-900 text-cream leading-tight"
@@ -97,6 +107,8 @@ export default function ScholarshipDetail() {
           {scholarship.country && <Fact label="Location" value={scholarship.country} />}
           {scholarship.study_duration && <Fact label="Duration" value={scholarship.study_duration} />}
           {scholarship.min_result && <Fact label="Min. Result" value={scholarship.min_result} />}
+          {scholarship.is_bumiputera && <Fact label="Eligibility" value="Bumiputera Candidates" />}
+          {scholarship.is_anak_negeri && <Fact label="State Quota" value="Anak Negeri Kelantan" />}
         </div>
 
         {/* Income group — subtle note */}

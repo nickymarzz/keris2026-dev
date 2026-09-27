@@ -81,6 +81,22 @@ export default function ScholarshipCard({ scholarship }) {
           )}
         </div>
 
+        {/* Eligibility badges */}
+        {(scholarship.is_bumiputera || scholarship.is_anak_negeri) && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {scholarship.is_bumiputera && (
+              <span className="text-[11px] bg-gold/15 text-gold px-2 py-0.5 border border-gold/30 font-spartan uppercase tracking-wide" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                Bumiputera
+              </span>
+            )}
+            {scholarship.is_anak_negeri && (
+              <span className="text-[11px] bg-crimson/25 text-cream px-2 py-0.5 border border-crimson/40 font-spartan uppercase tracking-wide" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                Anak Negeri
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
           {Array.isArray(scholarship.courses_offered) && scholarship.courses_offered.slice(0, 4).map(c => (

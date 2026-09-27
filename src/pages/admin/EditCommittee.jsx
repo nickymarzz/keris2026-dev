@@ -12,7 +12,7 @@ const DEPARTMENTS = [
 ]
 
 const EMPTY = {
-  name: '', role: '', department: 'Directors', is_head: false, photo_url: '',
+  name: '', role: '', department: 'Directors', batch_year: 2026, is_head: false, photo_url: '',
 }
 
 export default function EditCommittee() {
@@ -37,7 +37,16 @@ export default function EditCommittee() {
   useEffect(() => { load() }, [])
 
   const openNew  = ()  => { setForm(EMPTY); setEditing('new'); setError('') }
-  const openEdit = (m) => { setForm({ ...EMPTY, ...m, is_head: m.is_head ?? false }); setEditing(m.id); setError('') }
+  const openEdit = (m) => {
+    setForm({
+      ...EMPTY,
+      ...m,
+      batch_year: m.batch_year ?? '',
+      is_head: m.is_head ?? false,
+    })
+    setEditing(m.id)
+    setError('')
+  }
   const cancel   = ()  => { setEditing(null); setError('') }
   const set      = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -49,6 +58,7 @@ export default function EditCommittee() {
       name:       form.name.trim(),
       role:       form.role.trim() || null,
       department: form.department,
+      batch_year: form.batch_year ? parseInt(form.batch_year) : null,
       is_head:    form.department === 'Directors' ? false : form.is_head,
       photo_url:  form.photo_url || null,
     }
@@ -116,9 +126,12 @@ export default function EditCommittee() {
                 </select>
               </div>
 
+              {/* Batch Year */}
+              <Field label="Batch Year" value={form.batch_year} onChange={v => set('batch_year', v)} placeholder="2026" type="number" />
+
               {/* Head of dept toggle — hidden for Directors */}
               {form.department !== 'Directors' && (
-                <div className="flex items-center gap-3 pt-5">
+                <div className="flex items-center gap-3 pt-2 md:col-span-2">
                   <input
                     type="checkbox"
                     id="is_head"
@@ -189,6 +202,7 @@ export default function EditCommittee() {
                   <th>Name</th>
                   <th>Department</th>
                   <th>Role</th>
+                  <th>Year</th>
                   <th>Head</th>
                   <th>Actions</th>
                 </tr>
@@ -210,6 +224,7 @@ export default function EditCommittee() {
                     </td>
                     <td className="text-cream/50 font-times text-sm">{member.department}</td>
                     <td className="text-cream/50 font-times text-sm">{member.role || '—'}</td>
+                    <td className="text-cream/50 font-times text-sm">{member.batch_year ?? '—'}</td>
                     <td className="text-cream/50 font-times text-sm">
                       {member.department !== 'Directors' && member.is_head ? (
                         <span className="text-gold text-xs font-spartan uppercase" style={{ fontFamily: "'League Spartan', sans-serif" }}>Yes</span>

@@ -3,16 +3,18 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ scholars: 0, scholarships: 0 })
+  const [stats, setStats] = useState({ scholars: 0, scholarships: 0, milestones: 0 })
 
   useEffect(() => {
     Promise.all([
       supabase.from('scholars').select('id', { count: 'exact', head: true }),
       supabase.from('scholarships').select('id', { count: 'exact', head: true }),
-    ]).then(([s, sh]) => {
+      supabase.from('history_entries').select('id', { count: 'exact', head: true }),
+    ]).then(([s, sh, h]) => {
       setStats({
         scholars:     s.count  || 0,
         scholarships: sh.count || 0,
+        milestones:   h?.count || 0,
       })
     })
   }, [])
@@ -22,6 +24,7 @@ export default function AdminDashboard() {
     { label: 'Scholarships', value: stats.scholarships, to: '/admin/scholarships', icon: '📋', color: 'border-crimson/40' },
     { label: 'Committee',    value: null,               to: '/admin/committee',    icon: '🏛️', color: 'border-wine/40' },
     { label: 'News & Events', value: null,              to: '/admin/news',         icon: '📰', color: 'border-gold/40' },
+    { label: 'Milestones',   value: stats.milestones,   to: '/admin/history',      icon: '⏳', color: 'border-gold/40' },
   ]
 
   return (
@@ -37,7 +40,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
           {tiles.map(({ label, value, to, icon, color }) => (
             <div key={label} className={`glass-card p-6 border-t-2 ${color}`} style={{ borderRadius: 0 }}>
               <div className="text-2xl mb-2">{icon}</div>
@@ -62,6 +65,7 @@ export default function AdminDashboard() {
             { to: '/admin/scholarships', label: 'Edit Scholarships', desc: 'Update scholarship listings, status, and application links.' },
             { to: '/admin/committee',    label: 'Edit Committee',    desc: 'Manage committee members, departments, and photos.' },
             { to: '/admin/news',        label: 'Edit News & Events', desc: 'Post announcements, event recaps, and community updates.' },
+            { to: '/admin/history',     label: 'Edit Milestones & History', desc: 'Update timeline entries and key organizational milestones.' },
           ].map(({ to, label, desc }) => (
             <Link
               key={to}
