@@ -72,12 +72,25 @@ This creates all required tables (`scholarships`, `scholars`, `committee`, `news
 
 ### 5. Seed Sample Data (Optional)
 
-Populate your database with realistic scholarships, scholars, committee members, and news entries:
+Populate your database with realistic scholarships, scholars, committee members, and news entries. Because the database is secured with RLS preventing public inserts, you must use one of the following methods:
 
-```bash
-npm run seed
-```
+**Option A: SQL Editor (Recommended & Easiest)**
+1. Go to your **Supabase Dashboard → SQL Editor**.
+2. Open [`supabase/seed.sql`](supabase/seed.sql), copy everything, and paste it into the editor.
+3. Click **Run**. (Since this runs as a superuser, it perfectly bypasses RLS).
 
+**Option B: Terminal Script (`npm run seed`)**
+If you prefer running the script from your terminal, you must provide your Service Role Key to bypass the RLS blocks:
+1. Go to your **Supabase Dashboard → Project Settings → API**.
+2. Copy the **`service_role` (secret)** key.
+3. Open your `.env` file and add:
+   ```env
+   SUPABASE_SERVICE_ROLE_KEY=your-secret-service-role-key
+   ```
+4. Run the seed script:
+   ```bash
+   npm run seed
+   ```
 ---
 
 ### 6. Start Development Server
