@@ -23,7 +23,8 @@ for (const line of envContent.split('\n')) {
 }
 
 const supabaseUrl = env.VITE_SUPABASE_URL
-const supabaseKey = env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY
+// Use Service Role Key to bypass RLS for seeding, otherwise fallback to anon key (which will likely fail due to RLS)
+const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY in .env')
