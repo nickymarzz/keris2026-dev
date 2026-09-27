@@ -3,6 +3,9 @@
 -- Run this in your Supabase SQL Editor (Dashboard -> SQL Editor -> New Query)
 -- ==============================================================================
 
+-- 0. CLEAN TABLE DATA (Like starting a new project)
+TRUNCATE public.scholars, public.scholarships, public.committee, public.history_entries, public.news_entries CASCADE;
+
 -- 1. Seed Scholarships
 INSERT INTO public.scholarships (
   id, name, status, about, courses_offered, study_duration, country, application_url,

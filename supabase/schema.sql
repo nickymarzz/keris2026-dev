@@ -7,6 +7,21 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ------------------------------------------------------------------------------
+-- 0. CLEAN DATABASE (Like starting a new project)
+-- ------------------------------------------------------------------------------
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
+DROP FUNCTION IF EXISTS public.is_admin() CASCADE;
+DROP FUNCTION IF EXISTS public.rls_auto_enable() CASCADE;
+
+DROP TABLE IF EXISTS public.scholars CASCADE;
+DROP TABLE IF EXISTS public.scholarships CASCADE;
+DROP TABLE IF EXISTS public.committee CASCADE;
+DROP TABLE IF EXISTS public.history_entries CASCADE;
+DROP TABLE IF EXISTS public.news_entries CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+
+-- ------------------------------------------------------------------------------
 -- 1. Users Table (Role-based access tied to Supabase auth.users)
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.users (
